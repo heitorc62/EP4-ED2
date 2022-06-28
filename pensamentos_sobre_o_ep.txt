@@ -1,0 +1,1 @@
+Primeiramente, para realizar esa identificação de expressões regulares, precisamos representar um autômato finito não determinístico. NFA. Para fazer isso, ŕecisamos ressaltar que, nesse autômato há dois tipos de transição. Match (que serão representadas em um array). epsilon (ε) - que serão representadas em um digrafo. Portanto, devemos implementar esse Digrafo.
