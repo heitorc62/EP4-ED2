@@ -53,7 +53,6 @@ void Reconhecedor::nfa(){
         if(re[i] == '(' || re[i] == '*' || re[i] == ')')
             G.addAresta(i, i + 1);
     }
-
 }
 
 
