@@ -4,6 +4,8 @@
 #include <iostream>
 #include "Bag.h"
 
+using namespace std;
+
 class Digrafo{
     public:
     Digrafo(){};
@@ -16,15 +18,23 @@ class Digrafo{
     //directedDfs(int s);
     void dfs();
     void dfsR(int V, bool* marked/*, int* pre, int *beg, int *end, int& t*/);
+    void show();
 };
+
+void Digrafo::show(){
+    for(int i = 0; i < V; i++){
+        cout << "vértice " << i << ": ";
+        //cout << "O enderço dessa bag é: " << endl;
+        //cout << &adj[i] << endl;
+        adj[i].show();
+        cout << endl;
+    }
+}
 
 Digrafo::Digrafo(int V){
     this->V = V;
     this->E = 0;
     adj = new Bag<int>[V];
-    for(int v = 0; v < V; v++){
-        adj[v] = Bag<int>();
-    }
 }
 
 
@@ -50,6 +60,7 @@ void Digrafo::dfs(){
 
 void Digrafo::addAresta(int v, int w){
     adj[v].add(w);
+    //cout << v << "->" << w << endl;
     E++;
 }
 
