@@ -1,6 +1,10 @@
 #ifndef BAG_H
 #define BAG_H
 
+#include <iostream>
+
+using namespace std;
+
 template <class Item> 
 class Bag
 {
@@ -16,8 +20,14 @@ class Bag
   void add(Item item);
   bool isEmpty();
   int size();
+  void show();
   Item at(int i); 
 };
+
+template <class Item>
+void Bag<Item>::show(){
+  for(int i = 0; i < n; i++) cout << at(i) << " ";
+}
 
 template <class Item>
 Bag<Item>::Bag(): n(0), tam(1), v(new Item[1]) {};
@@ -50,7 +60,9 @@ template <class Item>
 Item Bag<Item>::at(int i) {
   if (i >= 0 && i < n)
     return (v[i]);
+  else return int();  
 }
+
 
 template <class Item>
 void Bag<Item>::resize(int t) {
