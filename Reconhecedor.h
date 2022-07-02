@@ -70,7 +70,7 @@ void Reconhecedor::nfa(){
             G.addAresta(lp, i + 1);
             G.addAresta(i + 1, lp);
         }
-        if(re[i] == '(' || re[i] == '*' || re[i] == ')')
+        if(re[i] == '(' || re[i] == '*' || re[i] == ')' || re[i] == '\\')
             G.addAresta(i, i + 1);
         /*
         cout << "Após a primeira iteração, o grafo é: " << endl;
@@ -87,6 +87,13 @@ bool Reconhecedor::reconhece(Digrafo G, char* texto){
     bool* atingidos = new bool[G.V];
     for(int i = 0; i < G.V; i++) atingidos[i] = false;
     G.dfsR(0, atingidos);
+
+    for(int i = 0; i < G.V; i++){
+        if(atingidos[i]){
+            if(re[i] == '(' || re[i] == ')' || re[i] == '\\') atingidos[i] = false;
+        }
+    }
+    
     for(int i = 0; i < strlen(texto); i++){
         /*
         for(int opa = 0; opa < G.V; opa++) cout << atingidos[opa] << " ";
@@ -104,7 +111,7 @@ bool Reconhecedor::reconhece(Digrafo G, char* texto){
                 for(int k = 0; k < G.V; k++) marked[k] = false;
                 G.dfsR(j, marked);
                 for(int k = 0; k < G.V; k++){
-                    if(marked[k]) atingidos[k] = true;
+                    if(marked[k] && re[k] != '(' && re[k] != ')' && re[k] != '\\') atingidos[k] = true;
                 }
             }
         }
