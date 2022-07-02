@@ -11,7 +11,7 @@ class Tradutor{
     char* trataPonto(int n, int i, char* traduzido);
     char* trataMais(int i, char* traduzido);
     bool simboloREgex(char simbolo);
-    int index;
+    int index = 0;
     public:
     Tradutor(){};
     char* traduz(string original);
@@ -144,27 +144,6 @@ char* Tradutor::traduz(string original){
         i++;
     }
 
-
-
-
-
-    /*
-    for(int i = 0; i < n + 1; i++){
-        if(traduzido[i] == '.'){
-            // traduzir para (a | b | c | d | e | ... ) para todos os caracteres da tabela ascii
-            novo = trataPonto(n, i, traduzido);
-            cout << "O tamanho de novo é: " << strlen(novo) << endl;
-            traduzido = new char[strlen(novo)];
-            strncpy(traduzido, novo, strlen(novo));
-            
-        }
-        else if(traduzido[i] == '+'){
-            novo = trataMais(i, traduzido);
-            traduzido = new char[strlen(novo)];
-            strncpy(traduzido, novo, strlen(novo));
-        }
-    }
-    */
     return novo;
 }
 
