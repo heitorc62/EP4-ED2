@@ -11,6 +11,7 @@ class Tradutor{
     char* trataPonto(int n, int i, char* traduzido);
     char* trataMais(int i, char* traduzido);
     bool simboloREgex(char simbolo);
+    int index;
     public:
     Tradutor(){};
     char* traduz(string original);
@@ -39,21 +40,23 @@ char* Tradutor::trataMais(int i, char* traduzido){
     string epa3 = epa1 + epa2;
     int len = epa3.length();
     j++;
-    cout << "Palavra resultante = " << epa3 << endl;
+    //cout << "Palavra resultante = " << epa3 << endl;
     char* p = new char[len + 1];
     strcpy(p, epa3.c_str());
-    for(int oi = 0; oi < strlen(p); oi++) cout << p[oi] << " ";
-    cout << endl;
-    cout << "O tamanho da tradução é: " << strlen(p) << endl;
-    cout << "i = " << i << " ;; j = " << j << endl;
+    //for(int oi = 0; oi < strlen(p); oi++) cout << p[oi] << " ";
+    //cout << endl;
+    //cout << "O tamanho da tradução é: " << strlen(p) << endl;
+    //cout << "i = " << i << " ;; j = " << j << endl;
     char* novo = new char[strlen(p) + strlen(traduzido) - (i - j + 1)];
-    cout << "oioi" << endl;
-    cout << strlen(novo) << endl;
+    //cout << "oioi" << endl;
+    //cout << strlen(novo) << endl;
     for(int q = 0; q < strlen(p) + strlen(traduzido) - (i - j + 1); q++){
         if(q >= j && q < j + strlen(p)) novo[q] = p[q - j];
         else if(q < j) novo[q] = traduzido[q];
         else novo[q] = traduzido[q - strlen(p) + (i - j + 1)];    
     }
+    index = strlen(p) + j;
+
     return novo;
 }
 
@@ -90,11 +93,11 @@ char* Tradutor::trataPonto(int n, int k, char* traduzido){
         }
     }
 
-    cout << endl;
-    cout << "Tamanho da palavra ini: " << strlen(traduzido) << endl;
-    cout << "tamanho esperado = " << strlen(traduzido) + strlen(p) - 1 << endl;
+    //cout << endl;
+    //cout << "Tamanho da palavra ini: " << strlen(traduzido) << endl;
+    //cout << "tamanho esperado = " << strlen(traduzido) + strlen(p) - 1 << endl;
     char* novo = new char[strlen(traduzido) + strlen(p) - 1];
-    cout << " k = " << k << endl;
+    //cout << " k = " << k << endl;
     j = 0; aux = 0;
     while(j + aux < strlen(traduzido) + strlen(p)){
         if(j < k) novo[j] = traduzido[j];
@@ -102,12 +105,12 @@ char* Tradutor::trataPonto(int n, int k, char* traduzido){
         else if(j > k) novo[j + aux - 1] = traduzido[j];
         j++;
     }
-    cout << "Tamanho de novo: " << strlen(novo) << endl; 
-    for(int i = 0; i < strlen(novo) + 1; i++){
-        cout << novo[i];
-    }
-    cout << endl;
-
+    //cout << "Tamanho de novo: " << strlen(novo) << endl; 
+    //for(int i = 0; i < strlen(novo) + 1; i++){
+    //    cout << novo[i];
+    //}
+    //cout << endl;
+    index = strlen(p);
     return novo;
 }
 
@@ -116,65 +119,52 @@ char* Tradutor::traduz(string original){
     char* traduzido = new char[n + 1];
     strcpy(traduzido, original.c_str());
     char* novo;
+    int i = 0;
+    while(i < strlen(traduzido)){
+        if(traduzido[i] == '.'){
+            //cout << "ponto" <<endl;
+            novo = trataPonto(n, i, traduzido);
+            traduzido = new char[strlen(novo)];
+            strncpy(traduzido, novo, strlen(novo));
+            i = i + index - 1;
+            cout << "traduzido[" << i << "] = " << traduzido[i] << endl;
+
+        }
+        if(traduzido[i] == '+'){
+            //cout << "mais" << endl;
+            novo = trataMais(i, traduzido);
+            //cout << "i = " << i << endl;
+            //cout << "index = " << index << endl;
+            traduzido = new char[strlen(novo)];
+            strncpy(traduzido, novo, strlen(novo));
+            i = index - 1;
+            cout << "traduzido[" << i << "] = " << traduzido[i] << endl;
+
+        }
+        i++;
+    }
+
+
+
+
+
+    /*
     for(int i = 0; i < n + 1; i++){
         if(traduzido[i] == '.'){
-            cout << "PONTOOOO" << endl;
             // traduzir para (a | b | c | d | e | ... ) para todos os caracteres da tabela ascii
-            
-            /*
-            int dif;
-            string expt = "|*.+[]-^()";
-            dif = expt.length();
-            int nChars = 95 + 94 - dif;
-            char* p = new char[nChars];
-            p[0] = '('; p[nChars - 1] = ')';
-            for(int j = 0, k = 2; j < 95 || k < 94; j++, k = k + 2){
-                if(expt.find(char(j+32)) != string::npos){k = k - 2 ; continue;}
-                p[k - 1] = char(j + 32);
-                p[k] = '|';
-            }
-            novo = new char[n + 1 + nChars];
-            for(int j = 0; j < n + 1 + nChars; j++){
-                if(j < i) novo[j] = traduzido[j];
-                else if(j > i && j < i + nChars + 1) novo[j] = p[j - i - 1];
-                else novo[j] = traduzido[j - nChars];
-            }
-            */
-            cout << "i antes de entra = " << i << endl;
             novo = trataPonto(n, i, traduzido);
             cout << "O tamanho de novo é: " << strlen(novo) << endl;
+            traduzido = new char[strlen(novo)];
+            strncpy(traduzido, novo, strlen(novo));
             
         }
         else if(traduzido[i] == '+'){
             novo = trataMais(i, traduzido);
-            /*
-            int j = i; // "(...)+ = ...(...)*"
-            stack<char> pilha;
-            pilha.push('*'); j--;
-            pilha.push(traduzido[j]); j--; // ')'
-            int lp = 0, rp = 1;
-            string epa1 = "";
-            string epa2 = "";
-            while(lp != rp){
-                if(traduzido[j] == ')') rp++;
-                else if(traduzido[j] == '(') lp++;
-                pilha.push(traduzido[j]);
-                j--;
-            }
-            int tam = pilha.size();
-            while(!pilha.empty()){
-                epa2 = epa2 + pilha.top();
-                if(pilha.size() != tam && pilha.size() > 2) epa1 = epa1 + pilha.top();
-                pilha.pop();
-            }
-            string epa3 = epa1 + epa2;
-            cout << epa3;
-            */
-            
-
-
+            traduzido = new char[strlen(novo)];
+            strncpy(traduzido, novo, strlen(novo));
         }
     }
+    */
     return novo;
 }
 
