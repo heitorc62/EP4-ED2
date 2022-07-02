@@ -38,13 +38,21 @@ char* Tradutor::trataMais(int i, char* traduzido){
     }
     string epa3 = epa1 + epa2;
     int len = epa3.length();
+    j++;
+    cout << "Palavra resultante = " << epa3 << endl;
     char* p = new char[len + 1];
     strcpy(p, epa3.c_str());
-    char* novo = new char[strlen(p) + strlen(traduzido)];
-    for(int q = 0; q < strlen(novo); q++){
-        if(q >= j && q <= i) novo[q] = p[q - j];
+    for(int oi = 0; oi < strlen(p); oi++) cout << p[oi] << " ";
+    cout << endl;
+    cout << "O tamanho da tradução é: " << strlen(p) << endl;
+    cout << "i = " << i << " ;; j = " << j << endl;
+    char* novo = new char[strlen(p) + strlen(traduzido) - (i - j + 1)];
+    cout << "oioi" << endl;
+    cout << strlen(novo) << endl;
+    for(int q = 0; q < strlen(p) + strlen(traduzido) - (i - j + 1); q++){
+        if(q >= j && q < j + strlen(p)) novo[q] = p[q - j];
         else if(q < j) novo[q] = traduzido[q];
-        else novo[q] = traduzido[q - i];        
+        else novo[q] = traduzido[q - strlen(p) + (i - j + 1)];    
     }
     return novo;
 }
