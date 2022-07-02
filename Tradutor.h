@@ -10,12 +10,14 @@ class Tradutor{
     private:
     char* trataPonto(int n, int i, char* traduzido);
     char* trataMais(int i, char* traduzido);
+    char* trataIntervalo(int k, int first, int last, char* traduzido);
     bool simboloREgex(char simbolo);
     int index = 0;
     public:
     Tradutor(){};
     char* traduz(string original);
 };
+
 
 char* Tradutor::trataMais(int i, char* traduzido){
     int j = i; // "(...)+ = ...(...)*"
@@ -63,7 +65,6 @@ char* Tradutor::trataMais(int i, char* traduzido){
 bool Tradutor::simboloREgex(char simbolo){
     return (simbolo == '.' || simbolo == '|' || simbolo == '*' || simbolo == '+' || simbolo == '[' || simbolo == ']' || simbolo == '-' || simbolo == '^' || simbolo == '(' || simbolo == ')');
 }
-
 
 char* Tradutor::trataPonto(int n, int k, char* traduzido){
     string expt = "|*.+[]-^()";
@@ -114,14 +115,50 @@ char* Tradutor::trataPonto(int n, int k, char* traduzido){
     return novo;
 }
 
+char* Tradutor::trataIntervalo(int k, int first, int last, char* traduzido){
+    int nChars = last + 1 - first;
+    int nOu = nChars - 1;
+    int total = nChars + nOu;
+    char* p = new char[total + 2];
+    p[0] = '('; 
+    p[total + 1] = ')';
+    int i = 0, j = 1, cont = 0;
+    while(i < nChars){
+        p[j] = char(i + first);
+        if(cont < nOu){ p[j + 1] = '|'; cont++; }
+        i++;
+        j = j + 2;
+    }
+
+    char* novo = new char[strlen(traduzido) + strlen(p) - 5];
+    //cout << " k = " << k << endl;
+    j = k;
+    int aux = 0;
+    for(int q = 0; q < strlen(p) + strlen(traduzido) - 5; q++){
+        if(q >= j && q < j + strlen(p)) novo[q] = p[q - j];
+        else if(q < j) novo[q] = traduzido[q];
+        else novo[q] = traduzido[q - strlen(p) + 5];    
+    }
+
+    index = strlen(p) + j;
+    return novo;
+
+
+}
+
+
 char* Tradutor::traduz(string original){
     int n = original.length();
     char* traduzido = new char[n + 1];
     strcpy(traduzido, original.c_str());
+    char* backup = new char[n + 1];
+    strncpy(backup, traduzido, n + 1);
+    bool alterou = false;
     char* novo;
     int i = 0;
     while(i < strlen(traduzido)){
-        if(traduzido[i] == '.'){
+        if(traduzido[i] == '.' && (i == 0 || traduzido[i - 1] != '\\')){
+            alterou = true;
             //cout << "ponto" <<endl;
             novo = trataPonto(n, i, traduzido);
             traduzido = new char[strlen(novo)];
@@ -130,7 +167,8 @@ char* Tradutor::traduz(string original){
             cout << "traduzido[" << i << "] = " << traduzido[i] << endl;
 
         }
-        if(traduzido[i] == '+'){
+        if(traduzido[i] == '+' && (i == 0 || traduzido[i - 1] != '\\')){
+            alterou = true;
             //cout << "mais" << endl;
             novo = trataMais(i, traduzido);
             //cout << "i = " << i << endl;
@@ -141,10 +179,21 @@ char* Tradutor::traduz(string original){
             cout << "traduzido[" << i << "] = " << traduzido[i] << endl;
 
         }
+        if(traduzido[i] == '[' && (i == 0 || traduzido[i - 1] != '\\') && traduzido[i + 2] == '-'){
+            alterou = true;
+            int first = int(traduzido[i + 1]);
+            int last = int(traduzido[i + 3]);
+            novo = trataIntervalo(i, first, last, traduzido);
+            traduzido = new char[strlen(novo)];
+            strncpy(traduzido, novo, strlen(novo));
+            i = index - 1;
+            cout << "traduzido[" << i << "] = " << traduzido[i] << endl;
+        }
         i++;
     }
 
-    return novo;
+    if(alterou) return novo;
+    else return backup;
 }
 
 #endif
