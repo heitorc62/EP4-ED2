@@ -40,38 +40,46 @@ void Reconhecedor::nfa(){
     stack<int> pilha;
     stack<int> pilhaOu;
     int ou;
+    //cout << "O tamanho dessa expressão é: " << strlen(re) << endl;
     for(int i = 0; i < strlen(re); i++){
         int lp = i;
-        if(re[i] == '(' || re[i] == '|'){
-            pilha.push(i);
-        }
-        else if(re[i] == ')'){
-            while(re[pilha.top()] == '|'){
-                ou = pilha.top(); pilha.pop();
-                G.addAresta(ou, i);
-                pilhaOu.push(ou);
-            }
-            //Agora tem um lp na pilha.
-            lp = pilha.top(); pilha.pop();
-            while(!pilhaOu.empty()){
-                ou = pilhaOu.top(); pilhaOu.pop();
-                G.addAresta(lp, ou + 1);
-            }
-            /*
-            int ou = pilha.top(); pilha.pop();
-            if(re[ou] == '|'){
-                lp = pilha.top(); pilha.pop();
-                G.addAresta(lp, ou + 1);
-                G.addAresta(ou, i);
-            }
-            else lp = ou;*/
-        }
-        if(i + 1 < strlen(re) && re[i + 1] == '*'){
-            G.addAresta(lp, i + 1);
-            G.addAresta(i + 1, lp);
-        }
-        if(re[i] == '(' || re[i] == '*' || re[i] == ')' || re[i] == '\\')
+        if(re[i] == '\\'){
             G.addAresta(i, i + 1);
+            i++;
+        } 
+        else{
+            if(re[i] == '(' || re[i] == '|'){
+                pilha.push(i);
+            }
+            else if(re[i] == ')'){
+                while(re[pilha.top()] == '|'){
+                    ou = pilha.top(); pilha.pop();
+                    G.addAresta(ou, i);
+                    pilhaOu.push(ou);
+                }
+                //Agora tem um lp na pilha.
+                lp = pilha.top(); pilha.pop();
+                while(!pilhaOu.empty()){
+                    ou = pilhaOu.top(); pilhaOu.pop();
+                    G.addAresta(lp, ou + 1);
+                }
+                /*
+                int ou = pilha.top(); pilha.pop();
+                if(re[ou] == '|'){
+                    lp = pilha.top(); pilha.pop();
+                    G.addAresta(lp, ou + 1);
+                    G.addAresta(ou, i);
+                }
+                else lp = ou;*/
+            }
+            if(i + 1 < strlen(re) && re[i + 1] == '*'){
+                G.addAresta(lp, i + 1);
+                G.addAresta(i + 1, lp);
+            }
+            if(re[i] == '(' || re[i] == '*' || re[i] == ')')
+                G.addAresta(i, i + 1);
+
+        }
         /*
         cout << "Após a primeira iteração, o grafo é: " << endl;
         G.show();
