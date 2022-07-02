@@ -11,6 +11,8 @@ class Tradutor{
     char* trataPonto(int n, int i, char* traduzido);
     char* trataMais(int i, char* traduzido);
     char* trataIntervalo(int k, int first, int last, char* traduzido);
+    char* trataConjunto(int k, char* traduzido);
+    char* trataComplemento();
     bool simboloREgex(char simbolo);
     int index = 0;
     public:
@@ -146,6 +148,38 @@ char* Tradutor::trataIntervalo(int k, int first, int last, char* traduzido){
 
 }
 
+char* Tradutor::trataConjunto(int k, char* traduzido){
+    string auxString = "(";
+    int i = k + 1;
+    int tam = 1;
+    while(traduzido[i] != ']'){
+        auxString = auxString + traduzido[i];
+        if(traduzido[i + 1] != ']') auxString = auxString + '|';
+        i++;
+        tam++;
+    }
+    tam++;
+    auxString = auxString + ')';
+    int n = auxString.length();
+    char* p = new char[n+1];
+    strcpy(p, auxString.c_str());
+    //cout << auxString;
+
+    char* novo = new char[strlen(traduzido) + strlen(p) - tam];
+    //cout << " k = " << k << endl;
+    int j = k;
+    int aux = 0;
+    for(int q = 0; q < strlen(p) + strlen(traduzido) - tam; q++){
+        if(q >= j && q < j + strlen(p)) novo[q] = p[q - j];
+        else if(q < j) novo[q] = traduzido[q];
+        else novo[q] = traduzido[q - strlen(p) + tam];    
+    }
+
+    index = strlen(p) + j;
+    return novo;
+
+}
+
 
 char* Tradutor::traduz(string original){
     int n = original.length();
@@ -179,11 +213,20 @@ char* Tradutor::traduz(string original){
             cout << "traduzido[" << i << "] = " << traduzido[i] << endl;
 
         }
-        if(traduzido[i] == '[' && (i == 0 || traduzido[i - 1] != '\\') && traduzido[i + 2] == '-'){
+        if(traduzido[i] == '[' && (i == 0 || traduzido[i - 1] != '\\') && traduzido[i + 1] != '^' && traduzido[i + 2] == '-'){
             alterou = true;
             int first = int(traduzido[i + 1]);
             int last = int(traduzido[i + 3]);
             novo = trataIntervalo(i, first, last, traduzido);
+            traduzido = new char[strlen(novo)];
+            strncpy(traduzido, novo, strlen(novo));
+            i = index - 1;
+            cout << "traduzido[" << i << "] = " << traduzido[i] << endl;
+        }
+
+        if(traduzido[i] == '[' && (i == 0 || traduzido[i - 1] != '\\') && traduzido[i + 1] != '^' && traduzido[i + 2] != '-'){
+            alterou = true;
+            novo = trataConjunto(i, traduzido);
             traduzido = new char[strlen(novo)];
             strncpy(traduzido, novo, strlen(novo));
             i = index - 1;
