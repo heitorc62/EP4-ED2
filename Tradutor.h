@@ -59,8 +59,8 @@ char* Tradutor::trataPonto(int n, int k, char* traduzido){
     int dif;
     dif = expt.length();
     int nChars = 127 - 32;
-    int aux = nChars - dif;
-    int nOu = aux - 1;
+    int aux = nChars + dif;
+    int nOu = nChars - 1;
     int total = aux + nOu;
     char* p = new char[total + 2];
     p[0] = '('; 
@@ -68,13 +68,18 @@ char* Tradutor::trataPonto(int n, int k, char* traduzido){
     int i = 0, j = 1, cont = 0;
     while(i < nChars){
         if(simboloREgex(char(i + 32))){
+            p[j] = '\\';
+            p[j + 1] = char(i + 32);
+            if(cont < nOu){ p[j + 2] = '|'; cont++; }
             i++;
-            continue;
+            j = j + 3;
         }
-        p[j] = char(i + 32);
-        if(cont < nOu){ p[j + 1] = '|'; cont++; }
-        i++;
-        j = j + 2;
+        else{
+            p[j] = char(i + 32);
+            if(cont < nOu){ p[j + 1] = '|'; cont++; }
+            i++;
+            j = j + 2;
+        }
     }
 
     cout << endl;
