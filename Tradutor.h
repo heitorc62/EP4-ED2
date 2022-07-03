@@ -12,8 +12,9 @@ class Tradutor{
     char* trataMais(int i, char* traduzido);
     char* trataIntervalo(int k, int first, int last, char* traduzido);
     char* trataConjunto(int k, char* traduzido);
-    char* trataComplemento();
+    char* trataComplemento(int k, char* traduzido);
     bool simboloREgex(char simbolo);
+    bool contido(char caractere, char* conjunto);
     int index = 0;
     public:
     Tradutor(){};
@@ -180,6 +181,92 @@ char* Tradutor::trataConjunto(int k, char* traduzido){
 
 }
 
+bool Tradutor::contido(char caractere, char* conjunto){
+    for(int i = 0; i < strlen(conjunto); i++){
+        if(caractere == conjunto[i]) return true;
+    }
+    return false;
+}
+
+
+char* Tradutor::trataComplemento(int k, char* traduzido){
+    string auxString1 = "";
+    int l = k + 1;  // Agora estamos depois do "^"
+    int tam = 3;
+    while(traduzido[l] != ']'){
+        auxString1 = auxString1 + traduzido[l];
+        l++;
+        tam++;
+    }
+    cout << "O tamanho do q será substituido é: " << tam << endl;
+
+    int n1 = auxString1.length();
+    char* charArray = new char[n1+1];
+    strcpy(charArray, auxString1.c_str());
+
+
+
+    string auxString = "(";
+    for(int i = 32; i < 127; i++){
+        if(simboloREgex(char(i)) && !contido(char(i), charArray)){
+            auxString = auxString + '\\';
+            auxString = auxString + char(i);
+            if(i < 126) auxString = auxString + '|';
+        }
+        else if(!contido(char(i), charArray)){
+            auxString = auxString + char(i);
+            if(i < 126) auxString = auxString + '|';
+        } 
+    }
+    auxString = auxString + ')';
+    cout << "O tamanho da string q será colocada é: " << auxString.length() << endl;
+    cout << auxString << endl;
+
+    int n = auxString.length();
+    char* p = new char[n+1];
+    strcpy(p, auxString.c_str());
+    //cout << auxString;
+    cout << "O tamanho da string q será colocada é: " << strlen(p) << endl;
+
+    cout << "tamanho esperado = " << strlen(p) - tam + strlen(traduzido) << endl;
+
+    char* novo = new char[strlen(traduzido) + strlen(p) - tam];
+    //cout << " k = " << k << endl;
+    int j = k - 1;
+    cout << "traduzido[" << j << "] = " << traduzido[j] << endl;
+    int aux = 0;
+    for(int q = 0; q < strlen(p) + strlen(traduzido) - tam; q++){
+        if(q >= j && q < j + strlen(p)) novo[q] = p[q - j];
+        else if(q < j) novo[q] = traduzido[q];
+        else novo[q] = traduzido[q - strlen(p) + tam]; 
+    }
+    cout << "oioio" << endl;
+    index = strlen(p) + j;
+    cout << "tamanho esperado = " << strlen(p) - tam + strlen(traduzido) << endl;
+
+    cout << "tamanho final = " << strlen(novo) << endl;
+    if(strlen(novo) > strlen(p) - tam + strlen(traduzido)){
+        string s(novo);
+        //cout << s << endl;
+        //cout << "tamanho da string = " << s.length() << endl;
+        s.pop_back();
+        cout << s << endl;
+        //cout << "tamanho da string = " << s.length() << endl;
+        strcpy(novo, s.c_str());
+    }
+    return novo;
+
+
+
+
+
+
+
+
+
+}
+
+
 
 char* Tradutor::traduz(string original){
     int n = original.length();
@@ -227,6 +314,15 @@ char* Tradutor::traduz(string original){
         if(traduzido[i] == '[' && (i == 0 || traduzido[i - 1] != '\\') && traduzido[i + 1] != '^' && traduzido[i + 2] != '-'){
             alterou = true;
             novo = trataConjunto(i, traduzido);
+            traduzido = new char[strlen(novo)];
+            strncpy(traduzido, novo, strlen(novo));
+            i = index - 1;
+            cout << "traduzido[" << i << "] = " << traduzido[i] << endl;
+        }
+
+        if(traduzido[i] == '[' && (i == 0 || traduzido[i - 1] != '\\') && traduzido[i + 1] == '^'){
+            alterou = true;
+            novo = trataComplemento(i + 1, traduzido);
             traduzido = new char[strlen(novo)];
             strncpy(traduzido, novo, strlen(novo));
             i = index - 1;
